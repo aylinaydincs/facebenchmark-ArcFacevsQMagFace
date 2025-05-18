@@ -1,8 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-Act as a computer vision engineer. 
-
-a benchmark comparing ArcFace and MagFace on LFW using embedding-based classification, where I evaluated performance by accuracy, F1 score, confusion matrix, and misclassified face samples to understand strengths, weaknesses, and practical differences between the models
