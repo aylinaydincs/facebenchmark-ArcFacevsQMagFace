@@ -6,18 +6,27 @@ A comprehensive benchmarking system for comparing state-of-the-art face recognit
 
 ```
 ├── data/                   # All datasets
-│   ├── lfw/                # Original LFW images without cropping
+│   ├── lfw/                # Original LFW images (e.g., from Kaggle)
+│   └── lfw_sklearn/        # LFW images downloaded via scikit-learn (auto-download)
 │   └── aligned_lfw/        # Preprocessed, aligned images (112x112)
-├── models/                 # Downloaded PyTorch model weights
+├── models/                 # Downloaded PyTorch model weights (not tracked in git)
+├── results/                # Metrics, confusion matrices, misclassified samples (not tracked in git)
+│   ├── metrics/            # Performance metrics and comparison plots
+│   ├── confusion_matrices/ # Confusion matrices visualizations
+│   └── misclassified/      # Misclassified samples for error analysis
 ├── src/                    # All source code files
 │   ├── preprocess.py       # Face detection and alignment
 │   ├── models.py           # Model loading and embedding extraction
 │   ├── benchmark.py        # Benchmarking and evaluation
+│   ├── embeddings.py       # Embedding extraction logic
+│   ├── evaluate.py         # Evaluation metrics and utilities
+│   ├── utils.py            # Utility functions (e.g., ensure_dir, cosine_similarity)
+│   ├── visualize.py        # Visualization utilities
 │   └── main.py             # Main pipeline script
-└── results/                # Metrics, confusion matrices, misclassified samples
-    ├── metrics/            # Performance metrics and comparison plots
-    ├── confusion_matrices/ # Confusion matrices visualizations
-    └── misclassified/      # Misclassified samples for error analysis
+├── environment.yml         # Conda environment specification
+├── requirements.txt        # pip requirements
+├── README.md               # Project documentation
+└── .gitignore              # Git ignore file
 ```
 
 ## Prerequisites
@@ -142,14 +151,19 @@ After running the benchmark, results will be available in the `results` director
 
 Below are example results for ArcFace and QMagFace on both the original LFW dataset and the scikit-learn LFW dataset:
 
-| Model      | Dataset      | Optimal Threshold | Accuracy | F1 Score | Precision | Recall | MCC    | ROC AUC | EER    | TPR@FAR=1e-3 | TPR@FAR=1e-4 |
-|------------|-------------|------------------|----------|----------|-----------|--------|--------|---------|--------|--------------|--------------|-------------------------------|
-| ArcFace    | Original    | 0.2645           | 0.9418   | 0.9396   | 0.9763    | 0.9056 | 0.8860 | 0.9642  | 0.0777<br>(thr=0.1951) | 0.7236       | 0.5152       | 
-| QMagFace   | Original    | 0.2858           | 0.9752   | 0.9745   | 0.9993    | 0.9510 | 0.9514 | 0.9772  | 0.0463<br>(thr=0.1439) | 0.9510       | 0.9503       | 
-| ArcFace    | sklearn     | 0.2687           | 0.9520   | 0.9505   | 0.9811    | 0.9218 | 0.9057 | 0.9703  | 0.0613<br>(thr=0.2039) | 0.7448       | 0.0004       | 
-| QMagFace   | sklearn     | 0.2788           | 0.9814   | 0.9810   | 0.9994    | 0.9633 | 0.9634 | 0.9851  | 0.0329<br>(thr=0.1556) | 0.9634       | 0.9622       | 
+| Model    | Dataset   | Accuracy | F1 Score | Precision | Recall | MCC    | ROC AUC | EER    | TPR@FAR=1e-3 | TPR@FAR=1e-4 | Optimal Threshold | Confusion Matrix         |
+|----------|-----------|----------|----------|-----------|--------|--------|---------|--------|--------------|--------------|-------------------|-------------------------|
+| ArcFace  | Original  | 0.9418   | 0.9396   | 0.9763    | 0.9056 | 0.8860 | 0.9642  | 0.0777 | 0.7236       | 0.5152       | 0.2645 (0.1951)   | [[2934, 66],<br>[283, 2716]]  |
+| QMagFace | Original  | 0.9752   | 0.9745   | 0.9993    | 0.9510 | 0.9514 | 0.9772  | 0.0463 | 0.9510       | 0.9503       | 0.2858 (0.1439)   | [[2998, 2],<br>[133, 2866]]   |
+| ArcFace  | sklearn   | 0.9520   | 0.9505   | 0.9811    | 0.9218 | 0.9057 | 0.9703  | 0.0613 | 0.7448       | 0.0004       | 0.2687 (0.2039)   | [[64726, 1173],<br>[5153, 60746]] |
+| QMagFace | sklearn   | 0.9814   | 0.9810   | 0.9994    | 0.9633 | 0.9634 | 0.9851  | 0.0329 | 0.9634       | 0.9622       | 0.2788 (0.1556)   | [[65864, 35],<br>[2420, 63479]]  |
+
 - **Original**: Results on the original LFW dataset (e.g., from Kaggle).
 - **sklearn**: Results on the LFW dataset as downloaded and formatted by scikit-learn.
+
+> **Note:**  
+> Some LFW identities contain miscropped images (different people under the same name), which can affect results. Manual cleaning is recommended for best accuracy.  
+> Both ArcFace and QMagFace benchmarks use the **ResNet100** architecture for fair comparison.
 
 ## Customization
 
